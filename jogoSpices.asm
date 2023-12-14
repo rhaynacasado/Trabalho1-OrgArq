@@ -1,3 +1,5 @@
+
+;				Integrentes:
 ; Agnes Bressan de Almeida - 13677100
 ; Carolina Elias de Almeida Américo - 13676687
 ; Caroline Severiano Clapis - 13864673
@@ -8,7 +10,7 @@ jmp main
 
 Letra: var #1
 
-boneco: string "z" ; Para desenhar o personagem (o caracter é substituido no charmap)
+personagem: string "z" ; Para desenhar o personagem (o caracter é substituido no charmap)
 obstaculo: string "o"	; Para desenhar o obstaculo (o caracter é substituido no charmap)
 placar : string "SCORE: " ; String do placar
 
@@ -53,34 +55,36 @@ Rand : var #30			; Tabela de nrs. Randomicos entre 1 - 3
 
 	
 IncRand: var #1
-;
-; ----------x--------------x-----------
-main:	; Inicio do codigo	
+
+
+
+;-------------------------------------------------------------------------------
+
+
+
+main:
 	
-	call ApagaTela
+	call LimpaTela
 	
-	loadn r1, #tela0Linha0		; Imprime a tela inicial
+	; Desenha a tela inicial
+	loadn r1, #tela0Linha0
 	loadn r2, #256              ;cor marrom
-	call ImprimeTela
-	
-	loadn r1, #tela10Linha0		; Imprime a tela inicial
+	call DesenhaCenario
+	loadn r1, #tela10Linha0	
 	loadn r2, #768              ;cor oliva
-	call ImprimeTela
-	
-	loadn r1, #tela11Linha0		; Imprime a tela inicial
+	call DesenhaCenario	
+	loadn r1, #tela11Linha0
 	loadn r2, #1792             ;cor prata
-	call ImprimeTela
+	call DesenhaCenario
 	
-	jmp Loop_Inicio
 	
 	Loop_Inicio:
-		
-		call DigLetra 		; Le uma letra
-		
-		loadn r0, #13	; Espera que a tecla 'space' seja digitada para iniciar o jogo
+		; Espera que a tecla enter seja digitada para iniciar o jogo
+		call LeInput 		; 
+		loadn r0, #13
 		load r1, Letra
 		cmp r0, r1
-		jne Loop_Inicio
+		jne Loop_Inicio	; se a tecla digitada não for enter, ele volta ao loop
 	
 	setamento:
 		
@@ -102,35 +106,35 @@ main:	; Inicio do codigo
 	InicioJogo:		; Inicializa variaveis e registradores usados no jogo antes de comecar o loop principal
 		
 		
-		call ApagaTela				;	Imprime a tela basica do jogo
+		call LimpaTela				;	Imprime a tela basica do jogo
 		
 		loadn r1, #tela1Linha0
 		loadn r2, #512
-		call ImprimeTela
+		call DesenhaCenario
 		
 		;loadn R1, #tela3Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #2816		    ;   cor amarelo, meotoro
-		;call ImprimeTela   		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario   		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		;loadn R1, #tela4Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #512   			; verde, copa 
-		;call ImprimeTela  		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario  		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		;loadn R1, #tela6Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #256		    ;   cor marrom, tronco
-		;call ImprimeTela   		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario   		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		;loadn R1, #tela7Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #2304		    ;   raios do metoro
-		;call ImprimeTela   		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario   		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		;loadn R1, #tela8Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #1536    		   ;mato
-		;call ImprimeTela   		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario   		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		;loadn R1, #tela9Linha0	; Endereco onde comeca a primeira linha do cenario!!
 		;loadn R2, #1024   		; ESTRELAS
-		;call ImprimeTela   		;  Rotina de Impresao de Cenario na Tela Inteira
+		;call DesenhaCenario   		;  Rotina de Impresao de Cenario na Tela Inteira
 		
 		loadn r0, #3
 		loadn r1, #placar		; Imprime a tela inicial
@@ -138,9 +142,9 @@ main:	; Inicio do codigo
 		call ImprimeStr
 		
 		loadn r7, #' '	; Tecla para que o personagem pule
-		loadn r6, #490	; Posicao do boneco na tela (fixa no eixo x e variavel no eixo y)
+		loadn r6, #490	; Posicao do personagem na tela (fixa no eixo x e variavel no eixo y)
 		loadn r2, #519	; Posicao do obstaculo na tela (fixa no eixo x e variavel no eixo y)
-		load r4, boneco	; Guardando a string do boneco no registrador r4
+		load r4, personagem	; Guardando a string do personagem no registrador r4
 		load r1, obstaculo	; Guardando a string do obstaculo no registrador r1
 		loadn r5, #0	; Ciclo do pulo (0 = chao, entre 1 e 3 = sobe, maior que 3 = desce)
 		
@@ -148,17 +152,18 @@ main:	; Inicio do codigo
 	
 		LoopJogo:		; Loop principal do jogo
 		
-			call ChecaColisao	; Checa se houve uma colisao
+			call VerificaColisao	; verifica se a posição do personagem é a mesma do obstáculo
 			
 			call AtPontos 		; Atualiza os pontos
 			
 			call AtPosicaoObstaculo 	; Move o obstaculo
 			outchar r1, r2 				; Desenha o obstaculo
 			
-			call AtPosicaoBoneco	; Todo ciclo principal do jogo, a funcao AtPosicaoBoneco atualiza a posicao do boneco de acordo com a situacao
+			call ControlePulo	; Todo ciclo principal do jogo, a funcao ControlePulo atualiza a posicao do personagem de acordo com a situacao
 			
-			call ApagaPersonagem 	; Desenha o personagem
-			call PrintaPersonagem
+			; Desenha o personagem, atualizando sua posição
+			call RemovePersonagem 
+			call DesenhaPersonagem
 			
 			call DelayChecaPulo		; Todo ciclo principal do jogo, a funcao DelayChecaPulo atrasa a execucao e le uma tecla do teclado (que e' 'w' ou nao)
 			push r3 			; Checa se pode pular (caso o personagem esteja no chao)
@@ -172,21 +177,18 @@ main:	; Inicio do codigo
 	
 	
 	GameOver:
-	
-		call ApagaTela				;	Imprime a tela do fim do jogo
-		
+		; Imprime a tela do fim do jogo	
+		call LimpaTela				
 		loadn r1, #tela2Linha0
 		loadn r2, #3584
-		call ImprimeTela
-		
+		call DesenhaCenario	
 		loadn r1, #tela5Linha0
 		loadn r2, #2304
-		call ImprimeTela
-		
+		call DesenhaCenario
 		load r5, pontos
 		loadn r6, #865	
 		call PrintaNumero
-		call DigLetra
+		call LeInput
 		
 		
 		; Espera que a tecla 's' seja digitada para reiniciar o jogo
@@ -199,7 +201,7 @@ main:	; Inicio do codigo
 		cmp r0, r1
 		jne GameOver
 		
-		call ApagaTela
+		call LimpaTela
 	
 		pop r2
 		pop r1
@@ -209,115 +211,78 @@ main:	; Inicio do codigo
 		jmp setamento	
 		
 fim_de_jogo:
-	call ApagaTela
+	call LimpaTela
 	halt
 
-;########################################################################
-;#														  				#
-;#                  			SUBROTINAS						  		#
-;#														  				#
-;########################################################################
 
-;********************************************************
-;                   	Imprimestr
-;********************************************************
 
-Imprimestr:	;  Rotina de Impresao de Mensagens:    r0 = Posicao da tela que o primeiro caractere da mensagem sera' impresso;  r1 = endereco onde comeca a mensagem; r2 = cor da mensagem.   Obs: a mensagem sera' impressa ate' encontrar "/0"
-	push r0	; protege o r0 na pilha para preservar seu valor
-	push r1	; protege o r1 na pilha para preservar seu valor
-	push r2	; protege o r1 na pilha para preservar seu valor
+;--------------------------------------------------------------------------------------------------------------
 
-	
-	loadn r3, #'\0'	; Criterio de parada
 
-ImprimestrLoop:	
-	loadi r4, r1
-	cmp r4, r3
-	jeq ImprimestrSai
-	add r4, r2, r4
-	outchar r4, r0
-	inc r0
-	inc r1
-	jmp ImprimestrLoop
-	
-ImprimestrSai:	
-	pop r4	; Resgata os valores dos registradores utilizados na Subrotina da Pilha
-	pop r3
-	pop r2
-	pop r1
-	pop r0
-	rts
 
-;********************************************************
-;                  	     DigLetra
-;********************************************************
-
-DigLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra"
+; Espera que uma tecla seja digitada e salva na variavel global "Letra"
+LeInput:
+	; Protegendo valores dos registradores
 	push r0
 	push r1
-	loadn r1, #255	; Se nao digitar nada vem 255
+	loadn r1, #255	; caso não tenha nenhum input
 
-   DigLetra_Loop:
+   LeInputLoop:
 		inchar r0			; Le o teclado, se nada for digitado = 255
 		cmp r0, r1			; Compara r0 com 255
-		jeq DigLetra_Loop	; Fica lendo ate' que digite uma tecla valida
+		jeq LeInputLoop	; Fica lendo ate' que digite uma tecla valida
 
 	store Letra, r0			; Salva a tecla na variavel global "Letra"
 
+	; Restaura r0 e r1
 	pop r1
 	pop r0
 	rts
-	
-;********************************************************
-;                       ApagaTela
-;********************************************************
-ApagaTela:
+
+
+; Substitui todas as posições pelo caractere de espaço ' '
+LimpaTela:
 	push r0
 	push r1
 	
-	loadn r0, #1200		; apaga as 1200 posicoes da Tela
-	loadn r1, #' '		; com "espaco"
+	loadn r0, #1200		; quantidade de posições da tela
+	loadn r1, #' '		; "espaco" (caractere que será printado na tela)
 	
-	   ApagaTela_Loop:	;label for(r0=1200;r0>0;r0--)
-		dec r0
+	; Apaga as 1200 posicoes da Tela
+	LimpaTela_Loop:
+		dec r0		; diminui o valor de r0
 		outchar r1, r0
-		jnz ApagaTela_Loop
+		jnz LimpaTela_Loop
  
 	pop r1
 	pop r0
 	rts	
 	
-;********************************************************
-;                       IMPRIME TELA
-;********************************************************	
+; Desenha um cenário (30 linhas) na tela
+DesenhaCenario:
+	push r0	
+	push r1	; endereco da primeira linha do cenário
+	push r2	; cor do cenário para ser impresso
+	push r3	
+	push r4	
+	push r5	
+	push r6	
 
-ImprimeTela: 	;  Rotina de Impresao de Cenario na Tela Inteira
-		;  r1 = endereco onde comeca a primeira linha do Cenario
-		;  r2 = cor do Cenario para ser impresso
-
-	push r0	; protege o r3 na pilha para ser usado na subrotina
-	push r1	; protege o r1 na pilha para preservar seu valor
-	push r2	; protege o r1 na pilha para preservar seu valor
-	push r3	; protege o r3 na pilha para ser usado na subrotina
-	push r4	; protege o r4 na pilha para ser usado na subrotina
-	push r5	; protege o r5 na pilha para ser usado na subrotina
-	push r6	; protege o r6 na pilha para ser usado na subrotina
-
-	loadn R0, #0  	; posicao inicial tem que ser o comeco da tela!
-	loadn R3, #40  	; Incremento da posicao da tela!
-	loadn R4, #41  	; incremento do ponteiro das linhas da tela
-	loadn R5, #1200 ; Limite da tela!
-	loadn R6, #tela0Linha0	; Endereco onde comeca a primeira linha do cenario!!
+	loadn r0, #0  	; posicao inicial
+	loadn r3, #40  	; incremento (número de colunas)
+	loadn r4, #41  	; incremento do ponteiro das linhas da tela (41 por causa do '\0')
+	loadn r5, #1200 ; número total de posições
+	loadn r6, #tela0Linha0	; endereço da primeira linha
 	
-   ImprimeTela_Loop:
+   DesenhaCenarioLoop:
 		call ImprimeStr2
-		add r0, r0, r3  	; incrementaposicao para a segunda linha na tela -->  r0 = R0 + 40
-		add r1, r1, r4  	; incrementa o ponteiro para o comeco da proxima linha na memoria (40 + 1 porcausa do /0 !!) --> r1 = r1 + 41
-		add r6, r6, r4  	; incrementa o ponteiro para o comeco da proxima linha na memoria (40 + 1 porcausa do /0 !!) --> r1 = r1 + 41
-		cmp r0, r5			; Compara r0 com 1200
-		jne ImprimeTela_Loop	; Enquanto r0 < 1200
+		add r0, r0, r3  	; incrementa posicao para a segunda linha na tela
+		add r1, r1, r4  	; incrementa o ponteiro para o comeco da proxima linha na memoria
+		add r6, r6, r4  	; incrementa o ponteiro para o comeco da proxima linha na memoria
+		cmp r0, r5			
+		jne DesenhaCenarioLoop	; se r0 ainda não chegou em 1200, continua no loop
 
-	pop r6	; Resgata os valores dos registradores utilizados na Subrotina da Pilha
+	pop r6
 	pop r5
 	pop r4
 	pop r3
@@ -325,12 +290,6 @@ ImprimeTela: 	;  Rotina de Impresao de Cenario na Tela Inteira
 	pop r1
 	pop r0
 	rts
-				
-;---------------------
-
-;********************************************************
-;                   IMPRIME STRING2
-;********************************************************
 	
 ImprimeStr2:	;  Rotina de Impresao de Mensagens:    r0 = Posicao da tela que o primeiro caractere da mensagem sera' impresso;  r1 = endereco onde comeca a mensagem; r2 = cor da mensagem.   Obs: a mensagem sera' impressa ate' encontrar "/0"
 	push r0	; protege o r0 na pilha para preservar seu valor
@@ -404,64 +363,52 @@ ImprimeStr:	;  Rotina de Impresao de Mensagens:    r0 = Posicao da tela que o pr
 	pop r0
 	rts
 	
-;********************************************************
-;                   AtPosicaoBoneco
-;********************************************************
-
-;	Funcao que atualiza a posicao do boneco na tela de acordo com a necessidade da situacao
-
-AtPosicaoBoneco:
-
+; Controle do pulo/posicao do personagem
+ControlePulo:
 	push r0
 	
-	;if r5 = 1		; Caso o ciclo do pulo esteja em 1, 2, 3 ou 4, o boneco sobe
+	; Caso o ciclo do pulo esteja em 1, 2, 3 ou 4, o personagem sobe
 	loadn r0, #1
 	cmp r5, r0
-		ceq Sobe
+		ceq Cima
 
-	;if r5 = 2
 	loadn r0, #2
 	cmp r5, r0
-		ceq Sobe
+		ceq Cima
 		
-	;if r5 = 3
 	loadn r0, #3
 	cmp r5, r0
-		ceq Sobe
+		ceq Cima
 		
-	;if r5 = 4
 	loadn r0, #4
 	cmp r5, r0
-		ceq Sobe
-	
-	;if r5 = 5		; Caso o ciclo do pulo esteja em 5, 6, 7 ou 8, o boneco desce
+		ceq Cima
+		
+	; Começa a descida
 	loadn r0, #5
 	cmp r5, r0
-		ceq Desce
+		ceq Baixo
 		
-	;if r5 = 6
 	loadn r0, #6
 	cmp r5, r0
-		ceq Desce
+		ceq Baixo
 		
-	;if r5 = 7
 	loadn r0, #7
 	cmp r5, r0
-		ceq Desce
+		ceq Baixo
 		
-	;if r5 = 8
 	loadn r0, #8
 	cmp r5, r0
-		ceq Desce
+		ceq Baixo
 		
-	;if r5 != 0
-	loadn r0, #0		; Caso o boneco estaja no chao (ciclo = 0), o ciclo nao deve ser alterado aqui
+	; Caso o personagem estaja no chao (ciclo = 0), o ciclo nao deve ser alterado aqui	
+	loadn r0, #0
 	cmp r5, r0
-		cne IncrementaCiclo	; Caso esteja no ar, o ciclo deve continuar sendo incrementado
+		cne IncrementaPulo	; Caso esteja no ar, o ciclo deve continuar sendo incrementado
 		
-	loadn r0, #9	; Ate que o ciclo chegue em 9, entao se torna 0 novamente (boneco esta no chao novamente)
+	loadn r0, #9	; Ate que o ciclo chegue em 9, entao se torna 0 novamente (personagem esta no chao novamente)
 	cmp r5, r0
-		ceq ResetaCiclo
+		ceq ZeraPulo
 				
 		
 	pop r0
@@ -617,44 +564,30 @@ ChecaPulo:
 	push r3
 	load r3, Letra 			; Caso ' space' tenha sido pressionado	
 	cmp r7, r3
-		ceq IncrementaCiclo		; Inicia o ciclo do pulo
+		ceq IncrementaPulo		; Inicia o ciclo do pulo
 	pop r3 		
 	rts
 
-;********************************************************
-;                 IncrementaCiclo
-;********************************************************
 
 ; Incrementa o ciclo do pulo
-
-IncrementaCiclo:
-
+IncrementaPulo:
 	inc r5
 	rts
 	
-;********************************************************
-;                       ResetaCiclo
-;********************************************************
 
 ; Reseta o ciclo do pulo
-
-ResetaCiclo:
+ZeraPulo:
 
 	loadn r5, #0
 	rts
 	
-;********************************************************
-;                       SOBE
-;********************************************************
-
-; Funcao que sobe o personagem para a linha de cima (-40 em sua posicao)
-
-Sobe:
-
+	
+; Diminui em 40 a posição do personagem (sobe 1 linha)	
+Cima:
 	push r1
 	push r2
 	
-	call ApagaPersonagem
+	call RemovePersonagem	; remove o personagem da posição atual
 	
 	loadn r1, #40
 	sub r6, r6, r1
@@ -663,18 +596,12 @@ Sobe:
 	pop r1
 	rts 
 	
-;********************************************************
-;                       Desce
-;********************************************************
-
-; Funcao que desce o personagem para a linha de cima (+40 em sua posicao)
-	
-Desce:
-
+; Aumenta em 40 a posição do personagem (desce 1 linha)	
+Baixo:
 	push r1
 	push r2
 	
-	call ApagaPersonagem
+	call RemovePersonagem	; remove o personagem da posição atual
 	
 	loadn r1, #40
 	add r6, r6, r1
@@ -683,21 +610,13 @@ Desce:
 	pop r1
 	rts
 
-;********************************************************
-;                       IncrementaPontos
-;********************************************************
-
-; Funcao que  incrementa os pontos do jogador
-
-IncPontos:
-
+; Aumenta em 1 os pontos do jogador
+AumentaPontos:
 	push r1
 	push r2
 	
-	load r2, pontos
-	
-	inc r2
-	
+	load r2, pontos	
+	inc r2	
 	load r1, delay1
 	dec r1
 
@@ -715,27 +634,22 @@ IncPontos:
 	pop r1
 	rts
 
-;********************************************************
-;                AtualizaPontos
-;********************************************************
-
 AtPontos:
-
 	push r1
 	push r5
 	push r6
 	
 	loadn r1, #490		; Caso o obstaculo tenha passado pela posicao do jogador, incrementa a pontuacao
 	cmp r2, r1
-		ceq IncPontos
+		ceq AumentaPontos
 	
 	loadn r1, #450		; Idem, porem para o caso do obstaculo estar em  outra linha
 	cmp r2, r1
-		ceq IncPontos
+		ceq AumentaPontos
 		
 	loadn r1, #410		; Idem, porem para o caso do obstaculo estar em  outra linha
 	cmp r2, r1
-		ceq IncPontos
+		ceq AumentaPontos
 		
 	load r5, pontos
 	
@@ -825,41 +739,39 @@ PrintaNumero:	; R5 contem um numero de ate' 2 digitos e R6 a posicao onde vai im
 	rts
 
 ;********************************************************
-;                    PrintaPersonagem
+;                    DesenhaPersonagem
 ;********************************************************
 
 ; Desenha o personagem na tela
-
-PrintaPersonagem:
+DesenhaPersonagem:
 	push r0
 	
-	outchar r4, r6 ; Printa o corpo do boneco	
+	outchar r4, r6 ; Printa o corpo do personagem	
 	dec r4
 	loadn r0, #40
 	sub r6, r6, r0
-	outchar r4, r6 ; Printa a cabeca  do boneco
+	outchar r4, r6 ; Printa a cabeca  do personagem
 	add r6, r6, r0
 	inc r4
 	
 	pop r0			
 	rts
 	
-;********************************************************
-;                    ApagaPersonagem
-;********************************************************
 
-; Apaga o personagem da tela
-
-ApagaPersonagem:
-	
+; Coloca um caractere de espaço no lugar do personagem, removendo-o da tela
+RemovePersonagem:
 	push r4
 	push r0
-
-	loadn r4, #' '	; Printa um espaco no lugar do personagem, apagando-o
+	
+	; r6 é a posição da parte de baixo do personagem
+	
+	; Removendo a parte de baixo do personagem
+	loadn r4, #' '
 	outchar r4, r6 	
 	
+	; removendo a parte de cima do personagem
 	loadn r0, #40
-	sub r6, r6, r0
+	sub r6, r6, r0	; sobe 1 linha
 	outchar r4, r6 
 	add r6, r6, r0
 	
@@ -867,24 +779,24 @@ ApagaPersonagem:
 	pop r4
 	rts
 	
-;********************************************************
-;                ChecaColisao
-;********************************************************
-ChecaColisao:
+
+; Se a posição do personagem foi igual a do obstaculo, o jogo é finalizado
+VerificaColisao:
 	push r0
-	 
-	; Compara a posicao do corpo do personagem com a do obstaculo, se igual finaliza o jogo
-	cmp r2, r6 
-	jeq GameOver
 	
-	loadn r0,#40
-	sub r6,r6,r0
+	; r2 é a posição do obstáculo e r6 a da parte de baixo do personagem
 	
-	; Compara a posicao da cabeça do personagem com a do obstaculo, se igual finaliza o jogo
+	; comparando com a parte inferior do personagem
 	cmp r2, r6
 	jeq GameOver
 	
-	add r6,r6,r0
+	; comparando a posição do obstáculo com a cabeça do personagem
+	loadn r0,#40
+	sub r6,r6,r0	; sobe uma linha (parte de cima do personagem)
+	cmp r2, r6
+	jeq GameOver	
+
+	add r6,r6,r0	; desce uma linha (volta pra posição da parte de baixo do personagem)
 	
 	pop r0
 	rts
