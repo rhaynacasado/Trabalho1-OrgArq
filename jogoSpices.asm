@@ -20,41 +20,53 @@ pontos: var #1	; seta 1 para funcionar pontuacao
 delay1: var #5000	; Variaveis para usar como parametro para o delay(quanto maior forem, mais lenta é cada 'ciclo')
 delay2: var #5000
 
-Rand : var #30			; Tabela de nrs. Randomicos entre 1 - 3	
-	static Rand + #0, #3
-	static Rand + #1, #2
-	static Rand + #2, #2
-	static Rand + #3, #3
-	static Rand + #4, #3
-	static Rand + #5, #2
-	static Rand + #6, #1
-	static Rand + #7, #2
-	static Rand + #8, #1
-	static Rand + #9, #3
-	static Rand + #10, #2
-	static Rand + #11, #1
-	static Rand + #12, #3
-	static Rand + #13, #3
-	static Rand + #14, #2
-	static Rand + #15, #1
-	static Rand + #16, #2
-	static Rand + #17, #3
-	static Rand + #18, #1
-	static Rand + #19, #2
-	static Rand + #20, #1
-	static Rand + #20, #2
-	static Rand + #21, #3
-	static Rand + #22, #2
-	static Rand + #23, #2
-	static Rand + #24, #1
-	static Rand + #25, #1
-	static Rand + #26, #3
-	static Rand + #27, #2
-	static Rand + #28, #3
-	static Rand + #29, #2
+; Alturas randômicas do obstáculo
+NumAleatorio : var #40
+	static NumAleatorio + #0, #3
+	static NumAleatorio + #1, #2
+	static NumAleatorio + #2, #2
+	static NumAleatorio + #3, #3
+	static NumAleatorio + #4, #3
+	static NumAleatorio + #5, #2
+	static NumAleatorio + #6, #1
+	static NumAleatorio + #7, #2
+	static NumAleatorio + #8, #1
+	static NumAleatorio + #9, #3
+	static NumAleatorio + #10, #2
+	static NumAleatorio + #11, #1
+	static NumAleatorio + #12, #3
+	static NumAleatorio + #13, #3
+	static NumAleatorio + #14, #2
+	static NumAleatorio + #15, #1
+	static NumAleatorio + #16, #2
+	static NumAleatorio + #17, #3
+	static NumAleatorio + #18, #1
+	static NumAleatorio + #19, #2
+	static NumAleatorio + #20, #1
+	static NumAleatorio + #20, #2
+	static NumAleatorio + #21, #3
+	static NumAleatorio + #22, #2
+	static NumAleatorio + #23, #2
+	static NumAleatorio + #24, #1
+	static NumAleatorio + #25, #1
+	static NumAleatorio + #26, #3
+	static NumAleatorio + #27, #2
+	static NumAleatorio + #28, #3
+	static NumAleatorio + #29, #2
+	static NumAleatorio + #30, #2
+	static NumAleatorio + #31, #1
+	static NumAleatorio + #32, #3
+	static NumAleatorio + #33, #3
+	static NumAleatorio + #34, #2
+	static NumAleatorio + #35, #1
+	static NumAleatorio + #36, #2
+	static NumAleatorio + #37, #3
+	static NumAleatorio + #38, #1
+	static NumAleatorio + #39, #2
+
 
 	
-IncRand: var #1
+IncrementoAleatorio: var #1
 
 
 
@@ -62,8 +74,7 @@ IncRand: var #1
 
 
 
-main:
-	
+main:	
 	call LimpaTela
 	
 	; Desenha a tela inicial
@@ -76,15 +87,14 @@ main:
 	
 	Loop_Inicio:
 		; Espera que a tecla enter seja digitada para iniciar o jogo
-		call LeInput 		
-		loadn r0, #13
+		call LeInput 
+		loadn r0, #13 
 		load r1, Letra
 		cmp r0, r1
 		jne Loop_Inicio	; se a tecla digitada não for enter, ele volta ao loop
 	
 	; Inicializa variaveis e registradores usados no jogo antes de comecar o loop principal
 	DefinicoesIniciais:
-		
 		push r2
 		loadn r2, #0		; inicializa os pontos com 0
 		store pontos, r2
@@ -97,9 +107,7 @@ main:
 		store delay2, r0
 	
 
-	InicioJogo:
-		
-		
+	InicioJogo:	
 		call LimpaTela				
 		
 		; Imprime o cenário do jogo
@@ -117,7 +125,7 @@ main:
 		call DesenhaCenario   				
 		
 		
-		loadn r0, #3
+		loadn r0, #55
 		loadn r1, #placar		; Imprime a tela inicial
 		loadn r2, #0
 		call ImprimeStr
@@ -129,19 +137,16 @@ main:
 		load r4, personagem	; Guardando a string do personagem no registrador r4
 		load r1, obstaculo	; Guardando a string do obstaculo no registrador r1
 		loadn r5, #0	; Ciclo do pulo (0 = chao, entre 1 e 3 = sobe, maior que 3 = desce)
-		
-		jmp LoopJogo
 	
-		LoopJogo:		; Loop principal do jogo
-		
-			call VerificaColisao	; verifica se a posição do personagem é a mesma do obstáculo
+		LoopJogo:
+			call VerificaColisao	; verifica se a posição do personagem é a mesma do obstáculo, se for vai pro GameOver
 			
-			call AtPontos 		; Atualiza os pontos
+			call VerificaPonto 		; verifica se o jogador ganhou um ponto
 			
-			call AtPosicaoObstaculo 	; Move o obstaculo
-			outchar r1, r2 				; Desenha o obstaculo
+			call AtualizaObstaculo 	; atualiza a posição do obstáculo
+			outchar r1, r2 				; desenha o obstáculo na tela
 			
-			call ControlePulo	; Todo ciclo principal do jogo, a funcao ControlePulo atualiza a posicao do personagem de acordo com a situacao
+			call ControlePulo	; se necessário atualiza a posição do personagem no pulo
 			
 			; Desenha o personagem, atualizando sua posição
 			call RemovePersonagem 
@@ -153,9 +158,8 @@ main:
 			cmp r5, r3
 				ceq VerificaPulo ; A funcao checa se o jogador mandou o personagem pular
 			pop r3
-				
-			
-		jmp LoopJogo 	; Volta para o loop
+					
+		jmp LoopJogo 	; continua no loop
 	
 	
 	GameOver:
@@ -172,7 +176,7 @@ main:
 		call LeInput
 		
 		; Espera que uma tecla válida seja digitada
-		loadn r0, #'s'	; termina o jogo
+		loadn r0, #'e'	; termina o jogo
 		load r1, Letra
 		cmp r0, r1
 		jeq fim_de_jogo
@@ -205,6 +209,7 @@ LeInput:
 	; Protegendo valores dos registradores
 	push r0
 	push r1
+	
 	loadn r1, #255	; caso não tenha nenhum input
 
    LeInputLoop:
@@ -394,137 +399,95 @@ ControlePulo:
 	pop r0
 	rts
 	
-;********************************************************
-;               ATUALIZA POSICAO DO OBSTACULO
-;********************************************************
-
-;	Funcao que atualiza a posicao do obstaculo na tela de acordo com a necessidade da situacao
-
-AtPosicaoObstaculo:
 	
+; Atualiza a posicao do obstaculo na tela de acordo com a necessidade da situacao
+AtualizaObstaculo:	
 	push r0
-	loadn r0 , #' '
 	
+	; Remove obstáculo da posição atual
+	loadn r0 , #' '
 	outchar r0, r2
 	
-	dec r2
+	dec r2	; acha a nova posição
 
-	;if posicao do obstaculo = 480 (fim da tela para a esquerda)
+	; Se o obstáculo já chegou no lado esquerdo da tela, ele é reiniciado
 	loadn r0, #480
 	cmp r2, r0
-		ceq ResetaObstaculo
-		
+		ceq ReiniciaObstaculo
 	loadn r0, #440
 	cmp r2, r0
-		ceq ResetaObstaculo
-		
+		ceq ReiniciaObstaculo		
 	loadn r0, #400
 	cmp r2, r0
-		ceq ResetaObstaculo
+		ceq ReiniciaObstaculo
 		
 	pop r0
 	rts
 
-;********************************************************
-;                       ResetaObstaculo
-;********************************************************
-
 ; Funcao que reseta a posicao do obstaculo
-
-ResetaObstaculo:
+ReiniciaObstaculo:
 	push r0
 	push r1
 	push r3
 	
-	loadn r2, #519		; Posicao (padrao do obstaculo)
+	loadn r2, #519		; como padrão, a altura do obstáculo é essa
 	
 	call GeraPosicao	; Gera a nova  posicao para o obstaculo
 	
 	loadn r1, #1		;  Caso 1
 	cmp r3,r1
-	ceq AlteraPos1
+		ceq Altura1
 	
 	loadn r1, #2		; Caso 2
 	cmp r3,r1
-	ceq AlteraPos2
+		ceq Altura2
+	
+	; OBS: se r3 for 3, o obstáculo permanece na altura padrão 519
 	
 	pop r3
 	pop r1
 	pop r0
 	rts
-
 	
-;********************************************************
-;                       GeraPosicao
-;********************************************************
-
 ; Funcao que gera uma posicao aleatoria para o obstaculo
-
 GeraPosicao :
 	push r0
 	push r1
 	
-
-						; sorteia nr. randomico entre 0 - 7
-	loadn r0, #Rand 	; declara ponteiro para tabela rand na memoria!
-	load r1, IncRand	; Pega Incremento da tabela Rand
-	add r0, r0, r1		; Soma Incremento ao inicio da tabela Rand
-						; R2 = Rand + IncRand
+	; Sorteando um valor aléatório entre 0 e 7
+	loadn r0, #NumAleatorio 	; declara ponteiro para tabela NumAleatorio na memoria!
+	load r1, IncrementoAleatorio	; pega Incremento da tabela NumAleatorio
+	add r0, r0, r1		; soma Incremento ao inicio da tabela NumAleatorio
 	loadi r3, r0 		; busca nr. randomico da memoria em R3
-						; R3 = Rand(IncRand)
-						
-	inc r1				; Incremento ++
-	loadn r0, #30
-	cmp r1, r0			; Compara com o Final da Tabela e re-estarta em 0
+	
+	; Se já chegou no final da tabela, volta pra 0			
+	inc r1
+	loadn r0, #40
+	cmp r1, r0
 	jne ResetaVetor
-		loadn r1, #0		; re-estarta a Tabela Rand em 0
-  ResetaVetor:
-	store IncRand, r1	; Salva incremento ++
+		loadn r1, #0		
+	
+	ResetaVetor:
+		store IncrementoAleatorio, r1	; salva o incremento
 	
 	
 	pop r1
 	pop r0
 	rts
+	
 
-;********************************************************
-;                       ResetaAleatorio
-;********************************************************
-
-; Funcao que reseta a semente para a funcao de geracao aleatoria
-
-ResetaAleatorio:	
-		
-		push r2
-		loadn r2,#28
-		
-		sub r1,r2,r2 
-		
-		pop r2
-		rts
-
-;********************************************************
-;     				  AlteraPos1
-;********************************************************
-
-; Caso 1 da posicao do obstaculo
-
-AlteraPos1:
+; Se a altura do obstáculo for 1
+Altura1:
 		push r1
 		
 		loadn r1,#40
-		sub r2,r2,r1
+		sub r2,r2,r1 
 		
-
 		pop r1
 		rts
 	
-;********************************************************
-;     				  AlteraPos2
-;********************************************************
-
-; Caso 2 da posicao do obstaculo
-
-AlteraPos2:
+; Se a altura do obstáculo for 2
+Altura2:
 		push r1
 		
 		loadn r1,#80
@@ -551,7 +514,6 @@ IncrementaPulo:
 
 ; Reseta o ciclo do pulo
 ZeraPulo:
-
 	loadn r5, #0
 	rts
 	
@@ -608,26 +570,27 @@ AumentaPontos:
 	pop r1
 	rts
 
-AtPontos:
+
+; Verifica se o jogador passou pelo obstáculo. Se passou, ele ganha 1 ponto
+VerificaPonto:
 	push r1
 	push r5
 	push r6
 	
-	loadn r1, #490		; Caso o obstaculo tenha passado pela posicao do jogador, incrementa a pontuacao
+	; Verifica se o obstáculo já passou pela coluna da posição do jogador
+	loadn r1, #490		; compara para o caso do obstáculo estar na linha de baixo
 	cmp r2, r1
-		ceq AumentaPontos
-	
-	loadn r1, #450		; Idem, porem para o caso do obstaculo estar em  outra linha
+		ceq AumentaPontos	
+	loadn r1, #450		; compara para o caso do obstáculo estar uma linha acima
 	cmp r2, r1
-		ceq AumentaPontos
-		
-	loadn r1, #410		; Idem, porem para o caso do obstaculo estar em  outra linha
+		ceq AumentaPontos		
+	loadn r1, #410		; compara para o caso do obstáculo estar duas linhas acima
 	cmp r2, r1
 		ceq AumentaPontos
 		
 	load r5, pontos
 	
-	loadn r6, #11
+	loadn r6, #63
 	
 	call ImprimePontuacao	; Imprime a pontuacao na tela
 	
@@ -766,11 +729,11 @@ VerificaColisao:
 	pop r0
 	rts
 
-													   
-;---------------------------------------------------------------
-; Tela de inicio:
-;---------------------------------------------------------------
 
+;-----------------------------------------------------------------------------------------------													   
+
+
+;-----------------------------Tela de Início--------------------------------
 
 tela0Linha0  : string "                                        "
 tela0Linha1  : string "                                        "
@@ -836,9 +799,8 @@ tela1Linha28 : string "                                        "
 tela1Linha29 : string "                                        "
 
 
-;---------------------------------------------------------------
-; Tela padrao do jogo
-;---------------------------------------------------------------
+
+;-----------------------Cenário do Jogo---------------------------
 
 tela2Linha0  : string "                                        "
 tela2Linha1  : string "                                        "
@@ -965,7 +927,11 @@ tela5Linha27 : string "                                        "
 tela5Linha28 : string "                                        "
 tela5Linha29 : string "                                        "
 
-;                      FIM DE JOGO
+
+
+;--------------------------FIM DE JOGO------------------------------
+
+
 tela6Linha0  : string "                                        "
 tela6Linha1  : string "                                        "
 tela6Linha2  : string "                                        "
