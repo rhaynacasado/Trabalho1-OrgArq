@@ -1,5 +1,5 @@
 # Dinossauro
-Jogo em Assembly inspirado no dinossauro do google desenvolvido como trabalho da disciplina SSC0902 Organizacao e Arquitetura de Computadores.
+Jogo em Assembly inspirado no dinossauro do Google desenvolvido como trabalho da disciplina SSC0902 Organizacao e Arquitetura de Computadores.
 
 Link da apresentação : https://drive.google.com/file/d/1nZzCbCRTrZ_qsgoh4iiM_aA3x1C01UK0/view?usp=sharing
 
